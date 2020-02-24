@@ -8,15 +8,16 @@ import (
 	"net/http"
 
 	"../models"
+
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/options"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // DB connection string for localhost mongoDB
-const connectionString = "mongodb://localhost:27017"
+const connectionString = "mongodb://root:password@localhost:27017"
 
 // database name
 const dbName = "socially"
@@ -40,7 +41,7 @@ func init() {
 	}
 
 	// Check the connection
-	err = client.Pint(context.TODO(), nil)
+	err = client.Ping(context.TODO(), nil)
 
 	if err != nil {
 		log.Fatal(err)
@@ -66,7 +67,7 @@ func CreateEvent(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	var event models.EventList
+	var event models.Event
 	_ = json.NewDecoder(r.Body).Decode(&event)
 	insertOneEvent(event)
 	json.NewEncoder(w).Encode(event)
@@ -83,14 +84,14 @@ func DeleteEvent(w http.ResponseWriter, r *http.Request) {
 }
 
 func getAllEvents() []primitive.M {
-	curr, err := collection.Find(context.Background(), bson.D{{}})
+	cur, err := collection.Find(context.Background(), bson.D{{}})
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	var results []primitive.M
 	for cur.Next(context.Background()) {
-		var result = bson.M
+		var result bson.M
 		e := cur.Decode(&result)
 		if e != nil {
 			log.Fatal(e)
@@ -106,7 +107,7 @@ func getAllEvents() []primitive.M {
 	return results
 }
 
-func insertOneEvent(event models.EventList) {
+func insertOneEvent(event models.Event) {
 	insertResult, err := collection.InsertOne(context.Background(), event)
 
 	if err != nil {
