@@ -13,3 +13,11 @@ services:
       - ./mongo-volume:/data/db
     ports:
       - '27017-27019:27017-27019'
+  
+  socially:
+      #image: 'docker-socially' # TODO Make container names consistent"
+    build: ./server
+    ports:
+      - '8080:8080'
+    depends_on:
+      - database
