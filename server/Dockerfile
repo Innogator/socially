@@ -1,19 +1,15 @@
-FROM golang:1.13.7-alpine
-RUN apk add git
+FROM golang:1.13.7
 
 COPY . /go/src/socially/server
 
-WORKDIR /go/src/app
-COPY ./main.go .
-# RUN GO GET 
-# 
-# 	"github.com/gorilla/mux"
-# 	"go.mongodb.org/mongo-driver/bson"
-# 	"go.mongodb.org/mongo-driver/bson/primitive"
-# 	"go.mongodb.org/mongo-driver/mongo"
-# 	"go.mongodb.org/mongo-driver/mongo/options"
+RUN go get "github.com/gorilla/mux"
+RUN go get "go.mongodb.org/mongo-driver/bson"
+RUN go get "go.mongodb.org/mongo-driver/bson/primitive"
+RUN go get "go.mongodb.org/mongo-driver/mongo"
+RUN go get "go.mongodb.org/mongo-driver/mongo/options"
 
-RUN go get -d -v ./...
-RUN go install -v ./...
+RUN go install socially/server
 
-CMD ["app"]
+ENTRYPOINT /go/bin/server
+
+EXPOSE 8080
