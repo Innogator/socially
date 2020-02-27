@@ -1,4 +1,4 @@
-FROM golang:1.13.7
+FROM golang:1.13.7 as build
 
 COPY . /go/src/socially/server
 
@@ -8,8 +8,17 @@ RUN go get "go.mongodb.org/mongo-driver/bson/primitive"
 RUN go get "go.mongodb.org/mongo-driver/mongo"
 RUN go get "go.mongodb.org/mongo-driver/mongo/options"
 
-RUN go install socially/server
+WORKDIR /go/src/socially/server
+RUN CGO_ENABLED=0 BOOS=linux go build -a -installsuffix cgo -o main .
 
-ENTRYPOINT /go/bin/server
+# Optimize image
+FROM alpine:latest
+
+RUN apk --no-cache add ca-certificates
+
+WORKDIR /root/
+COPY --from=build /go/src/socially/server/main .
 
 EXPOSE 8080
+
+CMD ["./main"]
