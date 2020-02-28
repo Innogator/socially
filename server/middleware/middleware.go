@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 
-	"../models"
+	"socially/server/models"
 
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
@@ -17,7 +17,7 @@ import (
 )
 
 // DB connection string for localhost mongoDB
-const connectionString = "mongodb://root:password@localhost:27017"
+const connectionString = "mongodb://mongo:27017"
 
 // database name
 const dbName = "socially"

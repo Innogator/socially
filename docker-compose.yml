@@ -1,7 +1,7 @@
 version: '3.1'
 
 services:
-  database:
+  mongo:
     image: 'mongo'
     container_name: 'mongo_socially'
     environment:
@@ -9,7 +9,25 @@ services:
         - MONGO_INITDB_ROOT_USERNAME=root
         - MONGO_INITDB_ROOT_PASSWORD=password
     volumes:
-      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+        #  - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
       - ./mongo-volume:/data/db
     ports:
       - '27017-27019:27017-27019'
+    networks:
+      - socially_network
+  
+  socially:
+      #image: 'docker-socially' # TODO Make container names consistent"
+    build: ./server
+    container_name: 'web_socially'
+    ports:
+      - '8080:8080'
+    depends_on:
+      - mongo
+    networks:
+      - socially_network
+    links:
+      - mongo
+
+networks:
+  socially_network:
